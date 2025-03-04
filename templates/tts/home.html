@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Text-to-Speech Converter{% endblock %}
+{% block content %}
+  <h1>Text-to-Speech Converter</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Convert</button>
+  </form>
+  
+  {% if audio %}
+    <hr>
+    <h2>Output Audio</h2>
+    <audio controls>
+      <source src="data:audio/mpeg;base64,{{ audio }}" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+  {% endif %}
+
+  {% if history %}
+    <hr>
+    <h2>Conversion History</h2>
+    <ul class="list-group">
+      {% for conversion in history %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ conversion.file_name }}</strong> – {{ conversion.conversion_date|date:"SHORT_DATETIME_FORMAT" }}
+            <br>
+            <small>{{ conversion.text|truncatewords:15 }}</small>
+          </div>
+          <div>
+            <a href="{{ conversion.audio_file.url }}" class="btn btn-sm btn-outline-secondary" download="{{ conversion.file_name }}">Download</a>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}
